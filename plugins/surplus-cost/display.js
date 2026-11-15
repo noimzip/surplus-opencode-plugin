@@ -1,6 +1,6 @@
 export const defaults = { sort: "discount", provider: true, trust: true, discount: true, prices: true, estimates: true, balance: true }
-export const sorts = { discount: "割引率順", input: "入力価格順", output: "出力価格順", model: "モデル名順", volume: "24時間取引額順" }
-export const fields = { provider: "プロバイダー", trust: "Trusted / Untrusted", discount: "割引率", prices: "入出力単価", estimates: "利用可能量の目安", balance: "残高" }
+export const sorts = { discount: "By discount", input: "By input price", output: "By output price", model: "By model name", volume: "By 24h volume" }
+export const fields = { provider: "Provider", trust: "Trusted / Untrusted", discount: "Discount", prices: "Input/Output prices", estimates: "Available tokens estimate", balance: "Balance" }
 
 export function sortRows(rows, sort) {
   return [...rows].sort((a, b) => {
@@ -20,7 +20,7 @@ export function rowText(row, settings, balance) {
   if (heading) lines.push(heading)
   const price = (v) => v === undefined ? "?" : `$${(v / 1e6).toFixed(4)}`
   const amount = (v) => balance === undefined || v === undefined || v <= 0 ? "?" : (balance / v).toFixed(2)
-  if (settings.prices) lines.push(`入 ${price(row.input)} / 出 ${price(row.output)}`)
-  if (settings.estimates) lines.push(`目安 入 ${amount(row.input)}M / 出 ${amount(row.output)}M`)
+  if (settings.prices) lines.push(`In ${price(row.input)} / Out ${price(row.output)}`)
+  if (settings.estimates) lines.push(`Est. In ${amount(row.input)}M / Out ${amount(row.output)}M`)
   return lines.map((line) => `  ${line}`).join("\n")
 }

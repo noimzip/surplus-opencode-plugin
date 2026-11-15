@@ -37,8 +37,8 @@ model catalog, so the sidebar follows the models configured there.
 
 Open the command palette and use:
 
-- `Surplus: 並び順を変更`
-- `Surplus: 表示項目を変更`
+- `Surplus: Change sort order`
+- `Surplus: Change display fields`
 
 Display preferences are persisted by OpenCode plugin storage.
 
@@ -56,7 +56,7 @@ The test suite uses mocked responses and does not make paid inference calls.
 - The best displayed offer is the best currently available and healthy offer
   by live discount. Actual request routing also considers estimated total
   request cost, health, trust policy, and failover.
-- If balance or market data is unavailable, the plugin displays `不明`/`?`
+- If balance or market data is unavailable, the plugin displays `Unknown`/`?`
   rather than treating the value as zero.
 - Surplus request IDs and settled charges are stored in OpenCode plugin
   storage so streamed requests can be reconciled after completion.

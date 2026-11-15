@@ -11,12 +11,12 @@ export default Plugin.define({
     ctx.keymap.layer(() => ({
       mode: "global",
       commands: [
-        { id: "surplus.sort", title: "Surplus: 並び順を変更", palette: true, run: async () => {
-          const chosen = await ctx.ui.dialog.select({ title: "Surplus 並び順", current: settings.sort, options: Object.entries(sorts).map(([value, title]) => ({ value, title })) })
+        { id: "surplus.sort", title: "Surplus: Change sort order", palette: true, run: async () => {
+          const chosen = await ctx.ui.dialog.select({ title: "Surplus Sort Order", current: settings.sort, options: Object.entries(sorts).map(([value, title]) => ({ value, title })) })
           if (chosen) await updateSettings((draft) => { draft.sort = chosen })
         } },
-        { id: "surplus.fields", title: "Surplus: 表示項目を変更", palette: true, run: async () => {
-          const chosen = await ctx.ui.dialog.select({ title: "Surplus 表示項目（選択で切替）", options: Object.entries(fields).map(([value, title]) => ({ value, title: `${settings[value] ? "☑" : "☐"} ${title}` })) })
+        { id: "surplus.fields", title: "Surplus: Change display fields", palette: true, run: async () => {
+          const chosen = await ctx.ui.dialog.select({ title: "Surplus Display Fields (select to toggle)", options: Object.entries(fields).map(([value, title]) => ({ value, title: `${settings[value] ? "☑" : "☐"} ${title}` })) })
           if (chosen) await updateSettings((draft) => { draft[chosen] = !draft[chosen] })
         } },
       ],
@@ -59,9 +59,9 @@ export default Plugin.define({
           onCleanup(() => { active = false; clearInterval(timer) })
         })
         return <box flexDirection="column">
-          <text fg={ctx.theme.text.muted}>{!value() ? "Surplus 実額: 取得中" : !value()!.settled && !value()!.pending ? "Surplus 実額: 未記録" : `Surplus 実額: $${(value()!.micro / 1_000_000).toFixed(6)} (${value()!.settled}件${value()!.pending ? ` / 確認中 ${value()!.pending}件` : ""})\n${value()!.compared ? `直接価格比: ${((1 - value()!.comparedMicro / value()!.directMicro) * 100).toFixed(1)}% 削減${value()!.compared < value()!.settled ? ` (${value()!.compared}/${value()!.settled}件)` : ""}` : "直接価格比: 不明"}`}</text>
-          <text fg={ctx.theme.text.muted}>{`${settings.balance ? `\n残高: ${markets()?.balance === undefined ? "不明" : `$${(markets()!.balance! / 1e6).toFixed(4)}`}` : ""}\nSurplus 最大割引 (USD/1M)\n${sorts[settings.sort] ?? sorts.discount}${settings.estimates ? "\n目安は入・出を別々に使用" : ""}`}</text>
-          <For each={markets() ? sortRows(markets()!.rows, settings.sort) : undefined} fallback={<text fg={ctx.theme.text.muted}>市場情報を取得中</text>}>
+          <text fg={ctx.theme.text.muted}>{!value() ? "Surplus cost: Loading" : !value()!.settled && !value()!.pending ? "Surplus cost: None recorded" : `Surplus cost: $${(value()!.micro / 1_000_000).toFixed(6)} (${value()!.settled} settled${value()!.pending ? ` / ${value()!.pending} pending` : ""})\n${value()!.compared ? `vs. direct: ${((1 - value()!.comparedMicro / value()!.directMicro) * 100).toFixed(1)}% saved${value()!.compared < value()!.settled ? ` (${value()!.compared}/${value()!.settled})` : ""}` : "vs. direct: Unknown"}`}</text>
+          <text fg={ctx.theme.text.muted}>{`${settings.balance ? `\nBalance: ${markets()?.balance === undefined ? "Unknown" : `$${(markets()!.balance! / 1e6).toFixed(4)}`}` : ""}\nSurplus Max Discount (USD/1M)\n${sorts[settings.sort] ?? sorts.discount}${settings.estimates ? "\nEst. assumes all-in or all-out" : ""}`}</text>
+          <For each={markets() ? sortRows(markets()!.rows, settings.sort) : undefined} fallback={<text fg={ctx.theme.text.muted}>Loading market data</text>}>
             {(row) => <text fg={row.discount === undefined ? ctx.theme.text.muted : row.discount > 95 ? "#00cc66" : row.discount >= 90 ? "#e6c200" : "#ff5555"}>{`\n${row.model}${rowText(row, settings, markets()?.balance) ? `\n${rowText(row, settings, markets()?.balance)}` : ""}`}</text>}
           </For>
         </box>

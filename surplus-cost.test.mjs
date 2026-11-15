@@ -19,10 +19,10 @@ assert.equal(affordableMtok("1000000", 500000), 2)
 assert.equal(affordableMtok(0, 500000), 0)
 assert.equal(affordableMtok(null, 500000), null)
 assert.equal(affordableMtok(100, 0), null)
-const sampleRows = [{ model: "b", discount: 92, input: 10, output: 50, volume: 3 }, { model: "a", discount: 99, input: 20, output: 5, volume: 9 }, { model: "z", text: "不明" }]
+const sampleRows = [{ model: "b", discount: 92, input: 10, output: 50, volume: 3 }, { model: "a", discount: 99, input: 20, output: 5, volume: 9 }, { model: "z", text: "Unknown" }]
 for (const [sort, expected] of Object.entries({ discount: ["a", "b", "z"], input: ["b", "a", "z"], output: ["a", "b", "z"], model: ["a", "b", "z"], volume: ["a", "b", "z"] })) assert.deepEqual(sortRows(sampleRows, sort).map((row) => row.model), expected)
 assert.match(rowText({ ...sampleRows[0], provider: "Test", trusted: true }, defaults, 100), /92\.00% Test T/)
-assert.doesNotMatch(rowText({ ...sampleRows[0], provider: "Test", trusted: true }, { ...defaults, provider: false, prices: false }, 100), /Test|入 \$/)
+assert.doesNotMatch(rowText({ ...sampleRows[0], provider: "Test", trusted: true }, { ...defaults, provider: false, prices: false }, 100), /Test|In \$/)
 assert.deepEqual(sortByVolume([{model:"missing"}, {model:"low",volume:0}, {model:"high",volume:"123"}, {model:"mid",volume:5}]).map(x => x.model), ["high", "mid", "low", "missing"])
 const store = new Map()
 const hooks = {}
@@ -68,9 +68,9 @@ assert.deepEqual(await rpc.session({ sessionID: "other" }), { micro: 0, settled:
 const marketResult = await rpc.markets({ sessionID: "s1" })
 assert.equal(marketResult.rows.length, 1)
 assert.match(marketResult.rows[0].text, /98\.15% Test U/)
-assert.match(marketResult.rows[0].text, /目安 入 100\.00M \/ 出 20\.00M/)
+assert.match(marketResult.rows[0].text, /Est\. In 100\.00M \/ Out 20\.00M/)
 assert.equal(marketResult.balance, 1850000)
-assert.doesNotMatch(marketResult.rows[0].text, /残枠/)
+assert.doesNotMatch(marketResult.rows[0].text, /Remaining/i)
 assert.equal(JSON.stringify([...store]).includes("test-secret"), false)
 cleanup()
 globalThis.fetch = oldFetch

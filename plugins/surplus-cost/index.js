@@ -27,9 +27,9 @@ export default Plugin.define({
             const market = await response.json()
             const offer = bestOffer(market)
             const volume = validMicro(market.volume_24h?.volume_usd)
-            if (!offer) return { model: model.id, text: "利用可能なオファーなし", volume }
+            if (!offer) return { model: model.id, text: "No available offers", volume }
             return { model: model.id, offer, volume }
-          } catch { return { model: model.id, text: "市場情報取得失敗" } }
+          } catch { return { model: model.id, text: "Market data unavailable" } }
         }))
         marketCache = { rows: sortByVolume(rows), updated: Date.now() }
         return marketCache
@@ -60,7 +60,7 @@ export default Plugin.define({
         ...(row.offer.input === null ? {} : { input: row.offer.input }),
         ...(row.offer.output === null ? {} : { output: row.offer.output }),
         ...(row.volume == null ? {} : { volume: row.volume }),
-        text: `${row.offer.discount.toFixed(2)}% ${row.offer.provider}${row.offer.trusted ? " T" : " U"}\n  入 ${price(row.offer.input)} / 出 ${price(row.offer.output)}\n  目安 入 ${tokens(row.offer.input)}M / 出 ${tokens(row.offer.output)}M`,
+        text: `${row.offer.discount.toFixed(2)}% ${row.offer.provider}${row.offer.trusted ? " T" : " U"}\n  In ${price(row.offer.input)} / Out ${price(row.offer.output)}\n  Est. In ${tokens(row.offer.input)}M / Out ${tokens(row.offer.output)}M`,
       } : { model: row.model, text: row.text, ...(row.volume == null ? {} : { volume: row.volume }) })
       rows.sort((a, b) => (b.discount ?? -Infinity) - (a.discount ?? -Infinity) || a.model.localeCompare(b.model))
       return { rows, updated: market.updated, ...(balance === null ? {} : { balance }) }
