@@ -1,0 +1,20 @@
+{
+  "name": "surplus-opencode-plugin",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "OpenCode V2 plugin for Surplus Intelligence cost and market display",
+  "exports": {
+    ".": "./plugins/surplus-cost/index.js",
+    "./tui": "./plugins/surplus-cost/tui.tsx",
+    "./rpc": "./plugins/surplus-cost/rpc.js"
+  },
+  "files": [
+    "plugins/surplus-cost",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "opencode": ">=2.3.0"
+  }
+}
