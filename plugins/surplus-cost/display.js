@@ -1,4 +1,4 @@
-import { affordableMtok, validMicro } from "./core.js"
+import { formatMtok, formatUsdMicro } from "./core.js"
 
 export const defaults = { sort: "discount", provider: true, trust: true, discount: true, prices: true, estimates: true, balance: true }
 export const sorts = { discount: "By discount", input: "By input price", output: "By output price", model: "By model name", volume: "By 24h volume" }
@@ -28,15 +28,7 @@ export function rowText(row, settings = defaults, balance) {
     opts.trust ? (row.trusted ? "T" : "U") : "",
   ].filter(Boolean).join(" ")
   if (heading) lines.push(heading)
-  const price = (v) => {
-    const micro = validMicro(v)
-    return micro === null ? "?" : `$${(micro / 1e6).toFixed(4)}`
-  }
-  const amount = (v) => {
-    const mtok = affordableMtok(balance, v)
-    return mtok === null ? "?" : mtok.toFixed(2)
-  }
-  if (opts.prices) lines.push(`In ${price(row.input)} / Out ${price(row.output)}`)
-  if (opts.estimates) lines.push(`Est. In ${amount(row.input)}M / Out ${amount(row.output)}M`)
+  if (opts.prices) lines.push(`In ${formatUsdMicro(row.input)} / Out ${formatUsdMicro(row.output)}`)
+  if (opts.estimates) lines.push(`Est. In ${formatMtok(balance, row.input)}M / Out ${formatMtok(balance, row.output)}M`)
   return lines.map((line) => `  ${line}`).join("\n")
 }
