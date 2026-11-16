@@ -9,8 +9,9 @@ OpenCode V2 plugin for Surplus Intelligence. It adds a sidebar view with:
 - estimated input/output Mtok available from the current Surplus balance
 - configurable sorting and display fields from the command palette
 
-The plugin does not store API keys. It uses the authorization header from the
-active Surplus request for account-scoped lookups, or `SURPLUS_API_KEY` when
+The plugin does not persist API keys. It uses the Bearer token from active
+`https://api.surplusintelligence.ai` requests (with an in-memory cross-session
+fallback within the running server process), or `SURPLUS_API_KEY` when
 available to the OpenCode server.
 
 ## Install from a clone
@@ -38,13 +39,16 @@ model catalog, so the sidebar follows the models configured there.
 Open the command palette and use:
 
 - `Surplus: Change sort order`
-- `Surplus: Change display fields`
+- `Surplus: Change display fields` (stays open across toggles until canceled)
+- `Surplus: Refresh` (immediately refreshes session cost and bypasses the server market cache)
 
 Display preferences are persisted by OpenCode plugin storage.
 
 ## Development
 
 ```bash
+npm test
+# or:
 node surplus-cost.test.mjs
 ```
 
@@ -52,7 +56,11 @@ The test suite uses mocked responses and does not make paid inference calls.
 
 ## Notes
 
-- Market data is refreshed approximately every 60 seconds.
+- Requests targeting `/min95/` are upgraded to `/min{floor}/` only when the
+  live best discount floor exceeds 95%; `/min95/` is never downgraded.
+- Market data is refreshed automatically approximately every 60 seconds (or on
+  demand with `Surplus: Refresh`). The sidebar shows an `Updated` timestamp and
+  preserves previously loaded data marked as stale on transient refresh errors.
 - The best displayed offer is the best currently available and healthy offer
   by live discount. Actual request routing also considers estimated total
   request cost, health, trust policy, and failover.
