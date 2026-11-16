@@ -9,6 +9,9 @@
     "./tui": "./plugins/surplus-cost/tui.tsx",
     "./rpc": "./plugins/surplus-cost/rpc.js"
   },
+  "scripts": {
+    "test": "node surplus-cost.test.mjs"
+  },
   "files": [
     "plugins/surplus-cost",
     "README.md",
