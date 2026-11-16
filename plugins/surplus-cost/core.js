@@ -11,6 +11,16 @@ export function affordableMtok(balance, price) {
   return funds === null || rate === null || rate === 0 ? null : funds / rate
 }
 
+export function formatUsdMicro(micro) {
+  const valid = validMicro(micro)
+  return valid === null ? "?" : `$${(valid / 1e6).toFixed(4)}`
+}
+
+export function formatMtok(balance, micro) {
+  const amount = affordableMtok(balance, micro)
+  return amount === null ? "?" : amount.toFixed(2)
+}
+
 export function sortByVolume(rows) {
   return [...rows].sort((a, b) => {
     const av = validMicro(a.volume), bv = validMicro(b.volume)
@@ -29,7 +39,16 @@ export function bestDiscountFloor(market) {
 
 export function bestOffer(market) {
   if (!Array.isArray(market?.offers)) return null
-  const eligible = market.offers.filter((offer) => offer.available === true && offer.healthy === true && typeof offer.discount_pct === "number" && Number.isFinite(offer.discount_pct))
+  const eligible = market.offers.filter(
+    (offer) =>
+      offer &&
+      offer.available === true &&
+      offer.healthy === true &&
+      typeof offer.discount_pct === "number" &&
+      Number.isFinite(offer.discount_pct) &&
+      offer.discount_pct >= 0 &&
+      offer.discount_pct <= 100
+  )
   eligible.sort((a, b) => b.discount_pct - a.discount_pct || (a.rank ?? Infinity) - (b.rank ?? Infinity))
   const offer = eligible[0]
   if (!offer) return null
@@ -37,8 +56,6 @@ export function bestOffer(market) {
     discount: offer.discount_pct,
     input: validMicro(offer.effective_input_per_1m),
     output: validMicro(offer.effective_output_per_1m),
-    remaining: validMicro(offer.cap_remaining),
-    cap: validMicro(offer.cap_daily),
     provider: typeof offer.provider === "string" ? offer.provider : "?",
     trusted: offer.trusted === true,
   }
